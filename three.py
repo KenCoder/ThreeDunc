@@ -62,6 +62,9 @@ class Board():
     def __init__(self, array):
         self.cells = array
 
+    def __eq__(self, other):
+        return self.cells == other.cells
+
     def shift(self, direction, new_value = -1, random_function = not_random_function):
         in_board = self.cells
         if direction in [DOWN, UP]:
@@ -131,8 +134,20 @@ class ThreeGame():
 
     def shift(self, direction):
         board = Board(self.board)
-        new_value, new_pkg = self.remaining_pkg.remove_random(self.randomfunction)
+        if self.remaining_pkg.remove_random(self.randomfunction) != None:
+            new_value, new_pkg = self.remaining_pkg.remove_random(self.randomfunction)
+        else:
+            self.remaining_pkg = ThreePackage(default_package)
+            new_value, new_pkg = self.remaining_pkg.remove_random(self.randomfunction)
         new_board = board.shift(direction, new_value, self.randomfunction)
         return ThreeGame(self.randomfunction, self.shufflefunction, new_board.cells, new_pkg)
+
+    def isEnded(self):
+        board = Board(self.board)
+        if board.shift(LEFT) == board and board.shift(RIGHT) == board and board.shift(UP) == board and board.shift(DOWN) == board:
+            return True
+        else:
+            return False
+
 
 

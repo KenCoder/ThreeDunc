@@ -25,6 +25,13 @@ class ThreesUnitTests(unittest.TestCase):
         self.assertEqual(Board(b).shift(RIGHT).cells, [[0, 1],
                                                        [0, 1]])
 
+        b = [
+            [0, 1],
+            [0, 1],
+        ]
+        self.assertEqual(Board(b).shift(RIGHT), Board([[0, 1],
+                                                       [0, 1]]))
+
         self.assertEqual(Board([[1, 1],
                                 [3, 3]]).shift(RIGHT).cells, [[1, 1],
                                                               [0, 6]])
@@ -147,3 +154,11 @@ class ThreesUnitTests(unittest.TestCase):
                                       [3, 0, 0, 0],
                                       [6, 3, 3, 6],
                                       ])
+        self.assertFalse(game.isEnded())
+
+        game = ThreeGame(not_random_function, no_shuffle_function, [[3, 6, 3, 6],
+                                                                    [6, 3, 6, 3],
+                                                                    [3, 6, 3, 6],
+                                                                    [6, 3, 6, 3],
+                                                                    ])
+        self.assertTrue(game.isEnded())

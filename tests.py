@@ -162,3 +162,4 @@ class ThreesUnitTests(unittest.TestCase):
                                                                     [6, 3, 6, 3],
                                                                     ])
         self.assertTrue(game.isEnded())
+

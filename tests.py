@@ -156,10 +156,19 @@ class ThreesUnitTests(unittest.TestCase):
                                       ])
         self.assertFalse(game.isEnded())
 
+    def testGameEnd(self):
         game = ThreeGame(not_random_function, no_shuffle_function, [[3, 6, 3, 6],
                                                                     [6, 3, 6, 3],
                                                                     [3, 6, 3, 6],
                                                                     [6, 3, 6, 3],
                                                                     ])
         self.assertTrue(game.isEnded())
+
+
+    def testBonusTile(self):
+        package = ThreePackage()
+        for i in range(13):
+            package.remove_random(not_random_function, 48)
+        self.assertSetEqual(set(package.items), set(default_package + [6]) - {1})
+
 

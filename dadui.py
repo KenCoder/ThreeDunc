@@ -86,30 +86,36 @@ def run_game():
         screen.blit(text, textpos)
 
     def draw_peek(piece):
-        fg, bg = piece_colors(piece)
-        rect = pygame.Rect( (SCREEN_WIDTH - PEEK_WIDTH) / 2, (TOP_START - PEEK_HEIGHT) / 2, PEEK_WIDTH, PEEK_HEIGHT)
-        pygame.draw.rect(screen, bg, rect)
-        if piece > 3:
-            txt = "+"
-            text = peek_font.render(txt, 1, fg)
-            textpos = text.get_rect()
-            textpos.center = rect.center
-            screen.blit(text, textpos)
+        for i in piece:
+            fg, bg = piece_colors(piece)
+        rect = [0, 0, 0]
+        rect[0] = pygame.Rect( ((SCREEN_WIDTH - PEEK_WIDTH) / 2)-PEEK_WIDTH-10, (TOP_START - PEEK_HEIGHT) / 2, PEEK_WIDTH, PEEK_HEIGHT)
+        rect[1] = pygame.Rect( (SCREEN_WIDTH - PEEK_WIDTH) / 2, (TOP_START - PEEK_HEIGHT) / 2, PEEK_WIDTH, PEEK_HEIGHT)
+        rect[2] = pygame.Rect( ((SCREEN_WIDTH - PEEK_WIDTH) / 2)+PEEK_WIDTH+10, (TOP_START - PEEK_HEIGHT) / 2, PEEK_WIDTH, PEEK_HEIGHT)
+        if piece[0] <= 3:
+            pygame.draw.rect(screen, bg, rect[1])
+        if piece[0] > 3 and len(piece) == 2:
+            for i in range(len(piece)):
+                txt = str(piece[i])
+                text = peek_font.render(txt, 1, fg)
+                textpos = text.get_rect()
+                textpos.center = rect[i].center
+                screen.blit(text, textpos)
 
     def draw_board(board, x, y):
         for row in range(4):
            for col in range(4):
                v = board[row][col]
-               if v != -1:
-                   fg, bg = piece_colors(v)
-                   rect = pygame.Rect( x + col * (CELL_WIDTH + BORDER) + BORDER, y + row * (CELL_HEIGHT + BORDER) + BORDER, CELL_WIDTH, CELL_HEIGHT)
-                   pygame.draw.rect(screen, bg, rect)
-                   if v > 0:
-                       txt = "%d" % v
-                       text = fonts[len(txt)-1].render(txt, 1, fg)
-                       textpos = text.get_rect()
-                       textpos.center = rect.center
-                       screen.blit(text, textpos)
+               # if v != -1:
+               #     fg, bg = piece_colors(v)
+               #     rect = pygame.Rect( x + col * (CELL_WIDTH + BORDER) + BORDER, y + row * (CELL_HEIGHT + BORDER) + BORDER, CELL_WIDTH, CELL_HEIGHT)
+               #     pygame.draw.rect(screen, bg, rect)
+               #     if v > 0:
+               #         txt = "%d" % v
+               #         text = fonts[len(txt)-1].render(txt, 1, fg)
+               #         textpos = text.get_rect()
+               #         textpos.center = rect.center
+               #         screen.blit(text, textpos)
 
     game = ThreeGame(true_random, true_shuffle)
 
@@ -138,17 +144,18 @@ def run_game():
                 if shift is not None:
                     baseboard = game.board
                     game = game.shift(shift)
-                    x, y = slide_start[shift]
-                    x *= CELL_WIDTH
-                    y *= CELL_HEIGHT
-                    # Take 0.5 seconds to slide. Want pixels per frame
-                    vx = -x / (FPS * MOVE_SPEED)
-                    vy = -y / (FPS * MOVE_SPEED)
+                    # x, y = slide_start[shift]
+                    # x *= CELL_WIDTH
+                    # y *= CELL_HEIGHT
+                    # # Take 0.5 seconds to slide. Want pixels per frame
+                    # vx = -x / (FPS * MOVE_SPEED)
+                    # vy = -y / (FPS * MOVE_SPEED)
 
         # Redraw the background
         screen.fill(BG_COLOR)
 
         draw_board(game.board, GUTTER_SIZE, GUTTER_SIZE+TOP_START)
+        draw_peek(game.peek())
         # for d in dirs:
         #     score = score_direction(game.board, dir)
         #     txt = "%.0f" % score

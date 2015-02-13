@@ -3,6 +3,25 @@ LEFT = 1
 DOWN = 2
 UP = 3
 from random import *
+from copy import *
+
+
+def generatePackage(random_function, largest_value = 0):
+    if random_function(2) != 0 or largest_value == 0:
+        new_package = ThreePackage(default_package)
+        print default_package
+    else:
+        all_below = range(1, largest_value/8 + 1)
+        possibilities = []
+        for i in all_below:
+            if i % 3 == 0 and i != 3:
+                possibilities.append(i)
+        package_items = deepcopy(default_package)
+        if possibilities != []:
+            extra_val = possibilities[random_function(len(possibilities))]
+            package_items.append(extra_val)
+        new_package = ThreePackage(package_items)
+    return new_package
 
 
 def can_combine(a, b):
@@ -13,6 +32,13 @@ def can_combine(a, b):
     else:
         return a == b
 
+def find_largest_value(board):
+    largest_val = 0
+    for row in board:
+        for idx in row:
+            if idx > largest_val:
+                largest_val = idx
+    return largest_val
 
 def shift_row(row):
     # item_pos = -1
@@ -90,6 +116,8 @@ class Board():
             out = swap_rows_and_cols(out)
         return Board(out)
 
+
+
 default_package = [1] * 4 + [2] * 4 + [3] * 4
 
 
@@ -109,19 +137,25 @@ class ThreePackage():
 
 
 class ThreeGame():
-    def __init__(self, randomfunction, shufflefunction, board = None, remaining_pkg = None):
-        self.randomfunction = randomfunction
-        self.shufflefunction = shufflefunction
+    #pro tip: passing a function as a default argument, it has to appear before the argument
+    def __init__(self, random_function, shuffle_function, package_generator = generatePackage, board = None, remaining_pkg = None):
+        self.randomfunction = random_function
+        self.shufflefunction = shuffle_function
         if board is None:
-            initial_pkg = ThreePackage()
+            initial_pkg = package_generator(random_function)
             initial_items = []
-            for i in range(9):
-                v, initial_pkg = initial_pkg.remove_random(randomfunction)
-                initial_items.append(v)
+            if len(initial_pkg.items) < 9:
+                for i in range(len(initial_pkg.items)):
+                    v, initial_pkg = initial_pkg.remove_random(random_function)
+                    initial_items.append(v)
+            else:
+                for i in range(9):
+                    v, initial_pkg = initial_pkg.remove_random(random_function)
+                    initial_items.append(v)
             # Fill rest with zeros
             initial_items = initial_items + [0] * (16 - len(initial_items))
             # Shuffle
-            initial_items = shufflefunction(initial_items)
+            initial_items = shuffle_function(initial_items)
             # Break into two d array
             self.board = []
             for i in range(4):
@@ -134,13 +168,13 @@ class ThreeGame():
 
     def shift(self, direction):
         board = Board(self.board)
-        if self.remaining_pkg.remove_random(self.randomfunction) != None:
-            new_value, new_pkg = self.remaining_pkg.remove_random(self.randomfunction)
-        else:
-            self.remaining_pkg = ThreePackage(default_package)
-            new_value, new_pkg = self.remaining_pkg.remove_random(self.randomfunction)
+        new_value, new_pkg = self.remaining_pkg.remove_random(self.randomfunction)
         new_board = board.shift(direction, new_value, self.randomfunction)
-        return ThreeGame(self.randomfunction, self.shufflefunction, new_board.cells, new_pkg)
+        if len(self.remaining_pkg.items) is 1:
+            self.remaining_pkg = generatePackage(self.randomfunction, find_largest_value(board.cells))
+            new_value, new_pkg = self.remaining_pkg.remove_random(self.randomfunction)
+        #Pro tip: Always check each of the places where you return a new class after changing the default argument order or adding a new default argument.
+        return ThreeGame(self.randomfunction, self.shufflefunction, generatePackage, new_board.cells, new_pkg)
 
     def isEnded(self):
         board = Board(self.board)
@@ -148,6 +182,33 @@ class ThreeGame():
             return True
         else:
             return False
+
+    def peek(self):
+        next_item = self.remaining_pkg.items[0]
+        final = []
+        if next_item <= 3:
+            return [next_item]
+        else:
+            return find_reasonable_values(next_item, find_largest_value(self.board), self.randomfunction)
+
+
+def find_reasonable_values(next_item, max, random_function):
+    pos = random_function(3)
+    if pos == 0:
+        final = next_item, next_item*2, next_item*4
+    elif pos == 1:
+        final = next_item/2, next_item, next_item*2
+    elif pos == 2:
+        final = next_item/4, next_item/2, next_item
+    else:
+        raise Exception("find reasonable values found an unknown position")
+    final = [i for i in final if i >= 6]
+    final = [i for i in final if i <= max/8]
+    return final
+
+
+
+
 
 
 

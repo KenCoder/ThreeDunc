@@ -109,15 +109,13 @@ class ThreesUnitTests(unittest.TestCase):
     def testPackage(self):
         package = ThreePackage()
         self.assertEqual(set(package.items), self.all_set)
-        removed_item, remaining_package = package.remove_random(not_random_function)
+        removed_item, remaining_package = package.remove_first()
         self.assertEqual(removed_item, 1)
         self.assertEqual(set(remaining_package.items), set([1] * 3 + [2] * 4 + [3] * 4))
-        self.assertEqual(package.remove_random(max_rand)[0], 3)
-        print "This one must have worked, right?"
         package = ThreePackage()
         for i in range(12):
-            v, package = package.remove_random(not_random_function)
-        result = package.remove_random(not_random_function)
+            v, package = package.remove_first()
+        result = package.remove_first()
         self.assertIsNone(result)
 
     def testGame(self):
@@ -260,3 +258,12 @@ class ThreesUnitTests(unittest.TestCase):
                                                                               [96, 0, 0, 0],
                                                                               ], ThreePackage([6]))
         self.assertEqual(game.peek(), [6, 12])
+
+    def testNoRemoveOnShift(self):
+        game = ThreeGame(not_random_function, no_shuffle_function, generatePackage, [[0, 0, 0, 0],
+                                                                              [1, 0, 0, 0],
+                                                                              [0, 0, 0, 0],
+                                                                              [96, 0, 0, 0],
+                                                                              ], ThreePackage([6]))
+        game.shift(LEFT)
+        self.assertEqual(game.remaining_pkg.items, [6])

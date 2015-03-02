@@ -87,35 +87,37 @@ def run_game():
 
     def draw_peek(piece):
         for i in piece:
-            fg, bg = piece_colors(piece)
+            fg, bg = piece_colors(i)
         rect = [0, 0, 0]
         rect[0] = pygame.Rect( ((SCREEN_WIDTH - PEEK_WIDTH) / 2)-PEEK_WIDTH-10, (TOP_START - PEEK_HEIGHT) / 2, PEEK_WIDTH, PEEK_HEIGHT)
         rect[1] = pygame.Rect( (SCREEN_WIDTH - PEEK_WIDTH) / 2, (TOP_START - PEEK_HEIGHT) / 2, PEEK_WIDTH, PEEK_HEIGHT)
         rect[2] = pygame.Rect( ((SCREEN_WIDTH - PEEK_WIDTH) / 2)+PEEK_WIDTH+10, (TOP_START - PEEK_HEIGHT) / 2, PEEK_WIDTH, PEEK_HEIGHT)
         if piece[0] <= 3:
             pygame.draw.rect(screen, bg, rect[1])
-        if piece[0] > 3 and len(piece) == 2:
+        if piece[0] > 3 and len(piece) == 3:
             for i in range(len(piece)):
                 txt = str(piece[i])
                 text = peek_font.render(txt, 1, fg)
                 textpos = text.get_rect()
                 textpos.center = rect[i].center
+                pygame.draw.rect(screen, (255, 255, 255), rect[i])
                 screen.blit(text, textpos)
 
     def draw_board(board, x, y):
         for row in range(4):
            for col in range(4):
                v = board[row][col]
-               # if v != -1:
-               #     fg, bg = piece_colors(v)
-               #     rect = pygame.Rect( x + col * (CELL_WIDTH + BORDER) + BORDER, y + row * (CELL_HEIGHT + BORDER) + BORDER, CELL_WIDTH, CELL_HEIGHT)
-               #     pygame.draw.rect(screen, bg, rect)
-               #     if v > 0:
-               #         txt = "%d" % v
-               #         text = fonts[len(txt)-1].render(txt, 1, fg)
-               #         textpos = text.get_rect()
-               #         textpos.center = rect.center
-               #         screen.blit(text, textpos)
+               if v != -1:
+                   fg, bg = piece_colors(v)
+                   rect = pygame.Rect( x + col * (CELL_WIDTH + BORDER) + BORDER, y + row * (CELL_HEIGHT + BORDER) + BORDER, CELL_WIDTH, CELL_HEIGHT)
+                   pygame.draw.rect(screen, bg, rect)
+                   if v > 0:
+                       txt = "%d" % v
+                       text = fonts[len(txt)-1].render(txt, 1, fg)
+                       textpos = text.get_rect()
+                       textpos.center = rect.center
+                       screen.blit(text, textpos)
+
 
     game = ThreeGame(true_random, true_shuffle)
 
@@ -132,6 +134,7 @@ def run_game():
             if event.type == pygame.QUIT:
                 exit_game()
             if event.type == pygame.KEYDOWN:
+                print game.peek(), game.peek()
                 if event.key == pygame.K_LEFT:
                     shift = LEFT
                 elif event.key == pygame.K_RIGHT:
@@ -175,6 +178,14 @@ def run_game():
         # draw_peek(game.peek())
 
         pygame.display.flip()
+        if game.isEnded() is True:
+            file = 'some.mp3'
+            pygame.mixer.init()
+            pygame.mixer.music.load('Price-is-right-losing-horn.mp3')
+            pygame.mixer.music.play()
+            while pygame.mixer.music.get_busy():
+                pygame.time.Clock().tick(10)
+            sys.exit()
 
 
 def exit_game():

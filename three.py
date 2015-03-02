@@ -125,15 +125,18 @@ class ThreePackage():
     def __init__(self, items = default_package):
         self.items = list(items)
 
-    def remove_random(self, random_function):
+    def remove_first(self):
         if self.items != []:
             after = list(self.items)
-            pos = random_function(len(after))
+            pos = 0
             v = after[pos]
             after.pop(pos)
             return v, ThreePackage(after)
         else:
             return None
+
+    def randomize(self, shuffle_function):
+        return shuffle_function(self.items)
 
 
 class ThreeGame():
@@ -146,11 +149,11 @@ class ThreeGame():
             initial_items = []
             if len(initial_pkg.items) < 9:
                 for i in range(len(initial_pkg.items)):
-                    v, initial_pkg = initial_pkg.remove_random(random_function)
+                    v, initial_pkg = initial_pkg.remove_first()
                     initial_items.append(v)
             else:
                 for i in range(9):
-                    v, initial_pkg = initial_pkg.remove_random(random_function)
+                    v, initial_pkg = initial_pkg.remove_first()
                     initial_items.append(v)
             # Fill rest with zeros
             initial_items = initial_items + [0] * (16 - len(initial_items))
@@ -167,12 +170,14 @@ class ThreeGame():
 
 
     def shift(self, direction):
+        self.remaining_pkg.randomize(self.shufflefunction)
         board = Board(self.board)
-        new_value, new_pkg = self.remaining_pkg.remove_random(self.randomfunction)
+        new_value, new_pkg = self.remaining_pkg.remove_first()
         new_board = board.shift(direction, new_value, self.randomfunction)
-        if len(self.remaining_pkg.items) is 1:
-            self.remaining_pkg = generatePackage(self.randomfunction, find_largest_value(board.cells))
-            new_value, new_pkg = self.remaining_pkg.remove_random(self.randomfunction)
+        if board.cells != new_board.cells:
+            if len(self.remaining_pkg.items) is 1:
+                self.remaining_pkg = generatePackage(self.randomfunction, find_largest_value(board.cells))
+                new_value, new_pkg = self.remaining_pkg.remove_first()
         #Pro tip: Always check each of the places where you return a new class after changing the default argument order or adding a new default argument.
         return ThreeGame(self.randomfunction, self.shufflefunction, generatePackage, new_board.cells, new_pkg)
 
@@ -185,7 +190,6 @@ class ThreeGame():
 
     def peek(self):
         next_item = self.remaining_pkg.items[0]
-        final = []
         if next_item <= 3:
             return [next_item]
         else:

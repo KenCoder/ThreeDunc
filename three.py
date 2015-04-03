@@ -91,7 +91,7 @@ class Board():
     def __eq__(self, other):
         return self.cells == other.cells
 
-    def shift(self, direction, new_value = -1, random_function = not_random_function):
+    def shift(self, direction, new_value=-1, random_function=not_random_function, return_moved=False):
         in_board = self.cells
         if direction in [DOWN, UP]:
             in_board = swap_rows_and_cols(in_board)
@@ -114,7 +114,9 @@ class Board():
             out = [reversed_list(x) for x in out]
         if direction in [DOWN, UP]:
             out = swap_rows_and_cols(out)
-        return Board(out)
+        if return_moved == False:
+            return Board(out)
+        return Board(out), len(moved)
 
 
 

@@ -78,6 +78,13 @@ class AIAspectBI():
         return value
 
 
+class AIAspectHV():
+    def evaluateBoard(self, board):
+        value = 0
+        for row in board:
+            if max(row) > value:
+                value = max(row)
+        return value
 
 
 #   EVALUATOR
@@ -103,22 +110,30 @@ class AIEvaluator():
             return False
         return True
 
-    def evaluateMove(self, board, incoming, direction):
+    def evaluateMove(self, board, incoming, direction, depth = 0, suggestion_func = None, ):
         firstBoard = Board(board)
         values = []
+        new_boards = []
         find_shift, length = firstBoard.shift(direction, incoming, not_random_function, True)
         for i in range(length):
             newBoard = firstBoard.shift(direction, incoming, lambda x: i)
             values.append(self.evaluateBoard(newBoard.cells))
-        if len(values) == 0:
-            return None
-        return sum(values)*1.0/len(values)
+            new_boards.append(newBoard)
+        if depth == 0:
+            if len(values) == 0:
+                return None
+            return sum(values)*1.0/len(values)
+        else:
+            total = 0
+            for forward_board in new_boards:
+                suggestion_func(forward_board, incoming, depth-1)
 
 
 
 
 
 #  THINKER
+#  - What to do: Finish double-recursive funciton. Passes back and forth between evaluateMove, reducing depth, to find the final set. So when depth is 0, does normal, and when depth is 1, one of them will average all of the results to find the total move value.
 
 
 class AIThinker():
@@ -128,7 +143,7 @@ class AIThinker():
         else:
             raise Exception("Thinker got an evaluator that was not an evaluator")
 
-    def suggestMove(self, board, incoming, pkg_used = []):
+    def suggestMove(self, board, incoming, depth = 0, pkg_used = []):
         if isinstance(incoming, int):
             new_val = [incoming]
         else:
@@ -138,14 +153,15 @@ class AIThinker():
         for i in range(len(values)):
             x = self.evaluator.evaluateMove(firstBoard.cells, new_val[0], i)
             values[i] = x
-        if max(values) == values[0]:
-            return RIGHT
-        elif max(values) == values[1]:
-            return LEFT
-        elif max(values) == values[2]:
-            return DOWN
-        else:
-            return UP
+        if depth == 0:
+            if max(values) == values[0]:
+                return RIGHT
+            elif max(values) == values[1]:
+                return LEFT
+            elif max(values) == values[2]:
+                return DOWN
+            else:
+                return UP
 
 
 

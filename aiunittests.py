@@ -33,6 +33,11 @@ class AIUnitTests(unittest.TestCase):
         self.assertEqual(ai.evaluateBoard([[0, 0], [1, 2]]), 1)
         self.assertEqual(ai.evaluateBoard([[0, 3], [1, 3]]), 2)
 
+    def testHighestValueAI(self):
+        ai = AIAspectHV()
+        self.assertEqual(ai.evaluateBoard([[0, 0], [1, 2]]), 2)
+        self.assertEqual(ai.evaluateBoard([[0, 96], [1, 2]]), 96)
+
     def testAIWeighting(self):
         ai = AIEvaluator([AIAspectBC(), AIAspectBI()], [1, -1])
         self.assertEqual(ai.evaluateBoard([[0, 3], [1, 3]]), 1)

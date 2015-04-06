@@ -221,6 +221,16 @@ class ThreesUnitTests(unittest.TestCase):
                                              [0, 0, 0, 0],
                                              ]), 0)
 
+    def testPackageUsesAll(self):
+        game = ThreeGame(not_random_function, no_shuffle_function,generatePackage, [[0, 0, 0, 0],
+                                                                              [1, 0, 0, 0],
+                                                                              [0, 0, 0, 0],
+                                                                              [1, 0, 0, 0],
+                                                                              ], ThreePackage([96]))
+        g2 = game.shift(DOWN)
+        self.assertEqual(g2.board, [[96,0,0,0],[0,0,0,0],[1,0,0,0],[1,0,0,0]])
+        self.assertEqual(len(g2.remaining_pkg.items), 12)
+
     def testFindReasonableValues(self):
         self.assertEqual(find_reasonable_values(6, 48, not_random_function), [6])
         self.assertEqual(find_reasonable_values(6, 96, not_random_function), [6, 12])

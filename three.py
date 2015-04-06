@@ -5,11 +5,15 @@ UP = 3
 from random import *
 from copy import *
 
+def true_shuffle(lst):
+    copy = list(lst)
+    shuffle(copy)
+    return copy
 
-def generatePackage(random_function, largest_value = 0):
+def generatePackage(random_function, largest_value = 0, shufflefunction = true_shuffle):
     if random_function(2) != 0 or largest_value == 0:
         new_package = ThreePackage(default_package)
-        print default_package
+        new_package.randomize(shufflefunction)
     else:
         all_below = range(1, largest_value/8 + 1)
         possibilities = []
@@ -21,6 +25,7 @@ def generatePackage(random_function, largest_value = 0):
             extra_val = possibilities[random_function(len(possibilities))]
             package_items.append(extra_val)
         new_package = ThreePackage(package_items)
+        new_package.randomize(shufflefunction)
     return new_package
 
 
@@ -92,6 +97,8 @@ class Board():
         return self.cells == other.cells
 
     def shift(self, direction, new_value=-1, random_function=not_random_function, return_moved=False):
+        if isinstance(new_value, list):
+            raise Exception("new_value must be int")
         in_board = self.cells
         if direction in [DOWN, UP]:
             in_board = swap_rows_and_cols(in_board)
@@ -172,14 +179,14 @@ class ThreeGame():
 
 
     def shift(self, direction):
-        self.remaining_pkg.randomize(self.shufflefunction)
         board = Board(self.board)
         new_value, new_pkg = self.remaining_pkg.remove_first()
         new_board = board.shift(direction, new_value, self.randomfunction)
         if board.cells != new_board.cells:
             if len(self.remaining_pkg.items) is 1:
-                self.remaining_pkg = generatePackage(self.randomfunction, find_largest_value(board.cells))
-                new_value, new_pkg = self.remaining_pkg.remove_first()
+                new_pkg = generatePackage(self.randomfunction, find_largest_value(board.cells))
+        else:
+            return None
         #Pro tip: Always check each of the places where you return a new class after changing the default argument order or adding a new default argument.
         return ThreeGame(self.randomfunction, self.shufflefunction, generatePackage, new_board.cells, new_pkg)
 

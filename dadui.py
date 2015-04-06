@@ -1,5 +1,6 @@
 import pygame
 import sys
+from AICore import MoreSmartAI
 from three import *
 import random
 
@@ -120,6 +121,7 @@ def run_game():
 
 
     game = ThreeGame(true_random, true_shuffle)
+    ai = MoreSmartAI()
 
     baseboard = None
     movingboard = None
@@ -146,7 +148,8 @@ def run_game():
 
                 if shift is not None:
                     baseboard = game.board
-                    game = game.shift(shift)
+                    if game.shift is not None:
+                        game = game.shift(shift)
                     # x, y = slide_start[shift]
                     # x *= CELL_WIDTH
                     # y *= CELL_HEIGHT
@@ -159,10 +162,10 @@ def run_game():
 
         draw_board(game.board, GUTTER_SIZE, GUTTER_SIZE+TOP_START)
         draw_peek(game.peek())
-        # for d in dirs:
-        #     score = score_direction(game.board, dir)
-        #     txt = "%.0f" % score
-        #     draw_score(d, txt)
+        for d in dirs:
+            score = ai.evaluateMoveValue(game.board, game.peek()[0], d)
+            txt = "%.0f" % score
+            draw_score(d, txt)
 
 
         # if baseboard is not None:

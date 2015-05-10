@@ -8,23 +8,23 @@ class AIUnitTests(unittest.TestCase):
         ai = dumbAI()
         self.assertNotEqual(ai.evaluateBoard([[0, 1], [0, 0]]), ai.evaluateBoard([[1, 1], [0, 0]]))
         ai = MoreSmartAI()
-        self.assertNotEqual(ai.evaluateBoardCombination([[0, 1], [0, 0]]), ai.evaluateBoardCombination([[1, 1], [0, 0]]))
-        self.assertNotEqual(ai.evaluateBoardImbalance([[0, 1], [0, 0]]), ai.evaluateBoardImbalance([[1, 256], [0, 0]]))
+        self.assertNotEqual(evaluateBoardCombination([[0, 1], [0, 0]]), evaluateBoardCombination([[1, 1], [0, 0]]))
+        self.assertNotEqual(evaluateBoardImbalance([[0, 1], [0, 0]]), evaluateBoardImbalance([[1, 256], [0, 0]]))
 
     def testCombinationAI(self):
         ai = MoreSmartAI()
-        self.assertEqual(ai.evaluateBoardCombination([[1, 0], [0, 0]]), 1)
-        self.assertEqual(ai.evaluateBoardCombination([[1, 3], [0, 256]]), 3)
+        self.assertEqual(evaluateBoardCombination([[1, 0], [0, 0]]), 1)
+        self.assertEqual(evaluateBoardCombination([[1, 3], [0, 256]]), 3)
 
     def testImbalanceAI(self):
         ai = MoreSmartAI()
-        self.assertEqual(ai.evaluateBoardImbalance([[0, 0], [1, 2]]), 1)
-        self.assertEqual(ai.evaluateBoardImbalance([[0, 3], [1, 3]]), 2)
+        self.assertEqual(evaluateBoardImbalance([[0, 0], [1, 2]]), 1)
+        self.assertEqual(evaluateBoardImbalance([[0, 3], [1, 3]]), 2)
 
     def testAIWeighting(self):
         ai = MoreSmartAI()
-        self.assertEqual(ai.evaluateBoard([[0, 3], [1, 3]], 1, -1), 1)
-        self.assertEqual(ai.evaluateBoard([[0, 3], [1, 3]], 1, -2), -1)
+        self.assertEqual(ai.evaluateBoard([[0, 3], [1, 3]], [evaluateBoardCombination, evaluateBoardImbalance], [1, -1]), 1)
+        self.assertEqual(ai.evaluateBoard([[0, 3], [1, 3]], [evaluateBoardCombination, evaluateBoardImbalance], [1, -2]), -1)
         self.assertEqual(ai.evaluateBoard([[1, 0], [0, 0]]), 1)
 
     def testAICheckValidMove(self):
@@ -48,4 +48,5 @@ class AIUnitTests(unittest.TestCase):
     def testAIRunGame(self):
         ai = MoreSmartAI()
         num_moves, highest, final = ai.play_game()
-        self.assertGreater(len(num_moves), 8)
+        print num_moves, highest, final
+        self.assertGreater(num_moves, 20)

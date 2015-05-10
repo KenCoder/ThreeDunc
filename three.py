@@ -92,6 +92,14 @@ class Board():
         return self.cells == other.cells
 
     def shift(self, direction, new_value=-1, random_function=not_random_function, return_moved=False):
+        """
+
+        :param direction:
+        :param new_value:
+        :param random_function:
+        :param return_moved:
+        :return:
+        """
         in_board = self.cells
         if direction in [DOWN, UP]:
             in_board = swap_rows_and_cols(in_board)
